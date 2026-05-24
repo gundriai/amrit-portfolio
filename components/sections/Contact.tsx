@@ -30,7 +30,6 @@ function LinkedInIcon({ size = 16 }: { size?: number }) {
   );
 }
 import { toast } from "sonner";
-import emailjs from "@emailjs/browser";
 import type { ContactFormData } from "@/types";
 
 const SOCIAL_LINKS = [
@@ -107,20 +106,28 @@ export default function Contact() {
     setStatus("loading");
 
     try {
-      await emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        {
-          from_name: form.name,
-          from_email: form.email,
+      const res = await fetch("https://formsubmit.co/ajax/amritniraula9@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
           subject: form.subject,
           message: form.message,
-        },
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
-      setStatus("success");
-      setForm(INITIAL_FORM);
-      toast.success("Message sent! I'll get back to you soon.", { duration: 5000 });
+          _captcha: "false",
+        }),
+      });
+
+      if (res.ok) {
+        setStatus("success");
+        setForm(INITIAL_FORM);
+        toast.success("Message sent! I'll get back to you soon.", { duration: 5000 });
+      } else {
+        throw new Error("Failed");
+      }
     } catch {
       setStatus("error");
       toast.error("Failed to send. Try emailing directly.", { duration: 5000 });
