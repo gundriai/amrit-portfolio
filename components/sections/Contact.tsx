@@ -117,6 +117,8 @@ export default function Contact() {
           email: form.email,
           subject: form.subject,
           message: form.message,
+          _replyto: form.email,
+          _subject: `[Portfolio] ${form.subject}`,
           _captcha: "false",
         }),
       });
